@@ -18,10 +18,20 @@ public class Loader
 	{
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-		TelegramApiBridge bridge = new TelegramApiBridge(PROD_SERVER, APP_ID, APP_HASH);
+		String phoneNumber;
+		do
+		{
+			System.out.println("============================");
+			System.out.println("Please, type phone number:");
+			phoneNumber = cleanNumberPhone(reader.readLine().trim());
+			if (!checkNumberPhoneCorrect(phoneNumber))
+				System.out.println("Phone number isn't correct!");
 
-		System.out.println("Please, type phone number:");
-		String phoneNumber = reader.readLine().trim();
+		} while (!checkNumberPhoneCorrect(phoneNumber));
+		System.out.println("Phone number is correct! Your phone number: " + phoneNumber);
+		System.out.println("============================");
+
+		TelegramApiBridge bridge = new TelegramApiBridge(PROD_SERVER, APP_ID, APP_HASH);
 		AuthCheckedPhone checkedPhone = bridge.authCheckPhone(phoneNumber);
 		System.out.println(checkedPhone.isRegistered());
 
@@ -34,4 +44,30 @@ public class Loader
 		User user = authAuthorization.getUser();				//получаем юзера
 		System.out.println("You signed in Telegram as " + user.getFirstName() + " " + user.getLastName());
 	}
+
+	private static String cleanNumberPhone(String phone)
+	{
+		/**
+		 * реализовать очистку номера телефона, вводимого из консоли, от лишних символов, чтобы его можно было вводить не только в формате
+		 *
+		 * 79091234567, но и с использованием лишних символов, например:
+		 * +7 909 123-­45-­67
+		 * +7 (909) 1234567
+		 * 7­-909-­123-­45-­67
+		 */
+		return phone.replaceAll("\\D+", "");
+	}
+
+	private static boolean checkNumberPhoneCorrect(String phone)
+	{
+		boolean numberIsCorrect = false;
+		final int correctNumberPhoneLength = 11;
+		if (phone.length() == correctNumberPhoneLength && phone.charAt(0) == '7' || phone.charAt(0) == '8')
+			numberIsCorrect = true;
+		return numberIsCorrect;
+
+	}
 }
+
+
+
