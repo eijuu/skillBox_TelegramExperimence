@@ -10,24 +10,30 @@ import java.io.InputStreamReader;
 
 public class Loader
 {
-	public static final String 	PROD_SERVER = "149.154.167.50:443";
-	public static final String 	APP_HASH 	= "529e70d628008c6d9927dda6003a3b58";
-	public static final Integer APP_ID 		= 778578;
+	public static final String 	PROD_SERVER 	= "149.154.167.50:443";
+	public static final String	APP_HASH 	= "529e70d628008c6d9927dda6003a3b58";
+	public static final Integer	APP_ID 		= 778578;
 
 	public static void main(String[] args) throws IOException
 	{
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
 		String phoneNumber;
-		do
+		while (true)
 		{
 			System.out.println("============================");
 			System.out.println("Please, type phone number:");
 			phoneNumber = cleanNumberPhone(reader.readLine().trim());
-			if (!checkNumberPhoneCorrect(phoneNumber))
+			if (checkNumberPhoneCorrect(phoneNumber)) 
+			{
+				break;
+			} 
+			else
+			{
 				System.out.println("Phone number isn't correct!");
+			}
+		}
 
-		} while (!checkNumberPhoneCorrect(phoneNumber));
 		System.out.println("Phone number is correct! Your phone number: " + phoneNumber);
 		System.out.println("============================");
 
@@ -60,12 +66,7 @@ public class Loader
 
 	private static boolean checkNumberPhoneCorrect(String phone)
 	{
-		boolean numberIsCorrect = false;
-		final int correctNumberPhoneLength = 11;
-		if (phone.length() == correctNumberPhoneLength && phone.charAt(0) == '7' || phone.charAt(0) == '8')
-			numberIsCorrect = true;
-		return numberIsCorrect;
-
+		return phone.matches("(7|8)\\d{10}");
 	}
 }
 
