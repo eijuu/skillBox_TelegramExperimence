@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="ConfirmationCode">
+  <grid id="27dc6" binding="rootPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
+    <constraints>
+      <xy x="20" y="20" width="736" height="400"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <grid id="90804" binding="centerPanel" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+        <constraints border-constraint="Center"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <grid id="e5313" binding="logoPanel" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+            <constraints/>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <grid id="d1016" binding="logoPicPanel" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+                <constraints/>
+                <properties/>
+                <border type="none"/>
+                <children/>
+              </grid>
+              <component id="3adac" class="javax.swing.JLabel" binding="logoLabel">
+                <constraints/>
+                <properties>
+                  <text value="Javagramm"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+          <component id="34929" class="javax.swing.JLabel" binding="phoneNumberLabel">
+            <constraints/>
+            <properties>
+              <alignmentX value="0.5"/>
+              <text value="+7 900 0078-59-29"/>
+            </properties>
+          </component>
+          <vspacer id="6d6ae">
+            <constraints/>
+          </vspacer>
+          <component id="39e9e" class="javax.swing.JLabel" binding="inputPhoneLabel">
+            <constraints/>
+            <properties>
+              <alignmentX value="0.5"/>
+              <horizontalAlignment value="0"/>
+              <horizontalTextPosition value="0"/>
+              <text value="Введите код страны и номер&#10;вашего мобильного телефона&#10;"/>
+            </properties>
+          </component>
+          <grid id="68213" binding="inputPhonePanel" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+            <constraints/>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <grid id="148c1" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+                <constraints/>
+                <properties/>
+                <border type="none"/>
+                <children/>
+              </grid>
+              <component id="73186" class="javax.swing.JPasswordField" binding="confirmCodePasswordField">
+                <constraints/>
+                <properties/>
+              </component>
+            </children>
+          </grid>
+          <component id="547fc" class="javax.swing.JButton" binding="continueButton">
+            <constraints/>
+            <properties>
+              <alignmentX value="0.5"/>
+              <text value="ПРОДОЛЖИТЬ"/>
+            </properties>
+          </component>
+          <vspacer id="67991">
+            <constraints/>
+          </vspacer>
+        </children>
+      </grid>
+    </children>
+  </grid>
+</form>

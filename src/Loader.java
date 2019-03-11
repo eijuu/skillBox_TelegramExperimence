@@ -5,9 +5,11 @@ import org.javagram.response.AuthSentCode;
 import org.javagram.response.object.User;
 import org.javagram.response.object.UserContact;
 
-import java.io.BufferedReader;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 public class Loader {
@@ -16,69 +18,101 @@ public class Loader {
     public static final Integer APP_ID = 778578;
 
     public static void main(String[] args) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-        String phoneNumber;
-        while (true) {
-            System.out.println("============================");
-            System.out.println("Please, type phone number:");
-            phoneNumber = cleanNumberPhone(reader.readLine().trim());
-            if (checkNumberPhoneCorrect(phoneNumber)) {
-                break;
-            } else {
-                System.out.println("Phone number isn't correct!");
-            }
-        }
-        System.out.println("Phone number is correct! Your phone number: " + phoneNumber);
-        System.out.println("============================");
+        JFrame frame = new JFrame();
+        frame.setLayout(new FlowLayout());
+
+        Login loginForm = new Login();
+        ConfirmationCode confirmationCodeForm = new ConfirmationCode();
+        ContactList contactListForm = new ContactList();
+
+        frame.setContentPane(loginForm.getRootPanel());
 
         TelegramApiBridge bridge = new TelegramApiBridge(PROD_SERVER, APP_ID, APP_HASH);
-        AuthCheckedPhone checkedPhone = bridge.authCheckPhone(phoneNumber);
-        System.out.println(checkedPhone.isRegistered());
 
-        //отправка кода
-        AuthSentCode authSentCode = bridge.authSendCode(phoneNumber);
-        System.out.println("Have been sent code. Please, type this code:");
-        String sentCode = reader.readLine().trim();
-        System.out.println("Your code: " + sentCode); //ввод кода
+        loginForm.getContinueButton().addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!loginForm.checkInputtedNumberPhoneCorrect()) {
+                    JOptionPane.showMessageDialog(
+                            loginForm.getRootPanel(),
+                            "Номер телефона не корректен",
+                            "Ошибка",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                try {
+                    AuthCheckedPhone checkedPhone = bridge.authCheckPhone(
+                            loginForm.getLoginNumberPhone());
+                    if (checkedPhone.isRegistered()) {
+                        confirmationCodeForm.setPhoneNumberLabel(loginForm.getLoginNumberPhone());
 
-        //пробуем авторизоваться
-        AuthAuthorization authAuthorization = bridge.authSignIn(sentCode);
+                        frame.setContentPane(confirmationCodeForm.getRootPanel());
+                        frame.setVisible(true);
+                    } else {
+                        JOptionPane.showMessageDialog(
+                                loginForm.getRootPanel(),
+                                "Номер телефона не зарегистрирован",
+                                "Ошибка",
+                                JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
 
-        //получаем юзера
-        User user = authAuthorization.getUser();
-        System.out.println("You signed in Telegram as " + user.getFirstName() + " " + user.getLastName());
+        confirmationCodeForm.getContinueButton().addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    confirmationCodeForm.setInputtedConfirmCode();
+                    if (!confirmationCodeForm.getInputtedConfirmCode().isBlank()) {
+                        AuthSentCode authSentCode = bridge.authSendCode(
+                                loginForm.getLoginNumberPhone());
+                        if (!authSentCode.isRegistered()) {
+                            JOptionPane.showMessageDialog(
+                                    loginForm.getRootPanel(),
+                                    "Неверный код",
+                                    "Ошибка",
+                                    JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+                        AuthAuthorization authAuthorization = bridge.authSignIn(
+                                confirmationCodeForm.getInputtedConfirmCode());
+                        User user = authAuthorization.getUser();
+                        contactListForm.fillAccountName(user.getFirstName() +
+                                " " + user.getLastName());
 
-        //Получить список контактов
-        ArrayList<UserContact> userContactList = bridge.contactsGetContacts();
-        System.out.println("Your contact list: ");
-        for (int i = 0; i < userContactList.size(); i++) {
-            UserContact contact = userContactList.get(i);
-            System.out.println((i + 1) + "). " +
-                    contact.getFirstName() + " " +
-                    contact.getLastName() + " " +
-                    contact.getPhone());
-        }
-        //Ожидание выхода
-        System.out.println("Enter any message to logout and exit");
-        reader.readLine();
-        bridge.authLogOut();
-    }
+                        ArrayList<UserContact> userContactList = bridge.contactsGetContacts();
+                        contactListForm.fillContactList(userContactList);
 
-    private static String cleanNumberPhone(String phone) {
-        /**
-         * реализовать очистку номера телефона, вводимого из консоли, от лишних символов, чтобы его можно было вводить не только в формате
-         *
-         * 79091234567, но и с использованием лишних символов, например:
-         * +7 909 123-­45-­67
-         * +7 (909) 1234567
-         * 7­-909-­123-­45-­67
-         */
-        return phone.replaceAll("\\D+", "");
-    }
 
-    private static boolean checkNumberPhoneCorrect(String phone) {
-        return phone.matches("(7|8)\\d{10}");
+                        frame.setContentPane(contactListForm.getRootPanel());
+                        frame.setVisible(true);
+                    } else {
+                        JOptionPane.showMessageDialog(
+                                confirmationCodeForm.getRootPanel(),
+                                "Введите присланный в СМС-сообщении код",
+                                "Сообщение",
+                                JOptionPane.INFORMATION_MESSAGE);
+                    }
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+
+
+            }
+        });
+
+        frame.setTitle("Javagramm");
+        frame.setSize(800, 600);
+
+        frame.setLocationRelativeTo(null);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+
     }
 }
 
