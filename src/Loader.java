@@ -7,8 +7,6 @@ import org.javagram.response.object.UserContact;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -30,79 +28,77 @@ public class Loader {
 
         TelegramApiBridge bridge = new TelegramApiBridge(PROD_SERVER, APP_ID, APP_HASH);
 
-        loginForm.getContinueButton().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (!loginForm.checkInputtedNumberPhoneCorrect()) {
+        loginForm.getContinueButton().addActionListener(e -> {
+            if (!loginForm.checkInputtedNumberPhoneCorrect()) {
+                JOptionPane.showMessageDialog(
+                        loginForm.getRootPanel(),
+                        "Номер телефона не корректен",
+                        "Ошибка",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            try {
+                AuthCheckedPhone checkedPhone = bridge.authCheckPhone(
+                        loginForm.getLoginNumberPhone());
+                if (checkedPhone.isRegistered()) {
+                    confirmationCodeForm.setPhoneNumberLabel(loginForm.getLoginNumberPhone());
+
+
+                    AuthSentCode authSentCode = bridge.authSendCode(
+                            loginForm.getLoginNumberPhone());
+
+                    frame.setContentPane(confirmationCodeForm.getRootPanel());
+                    confirmationCodeForm.setFocusToConfirmCodePasswordField();
+                    frame.setVisible(true);
+                } else {
                     JOptionPane.showMessageDialog(
                             loginForm.getRootPanel(),
-                            "Номер телефона не корректен",
+                            "Номер телефона не зарегистрирован",
                             "Ошибка",
                             JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                try {
-                    AuthCheckedPhone checkedPhone = bridge.authCheckPhone(
-                            loginForm.getLoginNumberPhone());
-                    if (checkedPhone.isRegistered()) {
-                        confirmationCodeForm.setPhoneNumberLabel(loginForm.getLoginNumberPhone());
-
-                        frame.setContentPane(confirmationCodeForm.getRootPanel());
-                        frame.setVisible(true);
-                    } else {
-                        JOptionPane.showMessageDialog(
-                                loginForm.getRootPanel(),
-                                "Номер телефона не зарегистрирован",
-                                "Ошибка",
-                                JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
+            } catch (IOException e1) {
+                e1.printStackTrace();
             }
         });
 
-        confirmationCodeForm.getContinueButton().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    confirmationCodeForm.setInputtedConfirmCode();
-                    if (!confirmationCodeForm.getInputtedConfirmCode().isBlank()) {
-                        AuthSentCode authSentCode = bridge.authSendCode(
-                                loginForm.getLoginNumberPhone());
-                        if (!authSentCode.isRegistered()) {
-                            JOptionPane.showMessageDialog(
-                                    loginForm.getRootPanel(),
-                                    "Неверный код",
-                                    "Ошибка",
-                                    JOptionPane.ERROR_MESSAGE);
-                            return;
-                        }
-                        AuthAuthorization authAuthorization = bridge.authSignIn(
-                                confirmationCodeForm.getInputtedConfirmCode());
-                        User user = authAuthorization.getUser();
-                        contactListForm.fillAccountName(user.getFirstName() +
-                                " " + user.getLastName());
+        confirmationCodeForm.getContinueButton().addActionListener(e -> {
+            try {
+                confirmationCodeForm.setInputtedConfirmCode();
+                if (!confirmationCodeForm.getInputtedConfirmCode().isBlank()) {
 
-                        ArrayList<UserContact> userContactList = bridge.contactsGetContacts();
-                        contactListForm.fillContactList(userContactList);
-
-
-                        frame.setContentPane(contactListForm.getRootPanel());
-                        frame.setVisible(true);
-                    } else {
+                    /*if (!authSentCode.isRegistered()) {
                         JOptionPane.showMessageDialog(
-                                confirmationCodeForm.getRootPanel(),
-                                "Введите присланный в СМС-сообщении код",
-                                "Сообщение",
-                                JOptionPane.INFORMATION_MESSAGE);
-                    }
-                } catch (IOException e1) {
-                    e1.printStackTrace();
+                                loginForm.getRootPanel(),
+                                "Неверный код",
+                                "Ошибка",
+                                JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }*/
+
+                    AuthAuthorization authAuthorization = bridge.authSignIn(
+                            confirmationCodeForm.getInputtedConfirmCode());
+
+                    User user = authAuthorization.getUser();
+                    contactListForm.fillAccountName(user.getFirstName() +
+                            " " + user.getLastName());
+
+                    ArrayList<UserContact> userContactList = bridge.contactsGetContacts();
+                    contactListForm.fillContactList(userContactList);
+
+
+                    frame.setContentPane(contactListForm.getRootPanel());
+                    frame.setVisible(true);
+                } else {
+                    JOptionPane.showMessageDialog(
+                            confirmationCodeForm.getRootPanel(),
+                            "Введите присланный в СМС-сообщении код",
+                            "Сообщение",
+                            JOptionPane.INFORMATION_MESSAGE);
                 }
-
-
+            } catch (IOException e1) {
+                e1.printStackTrace();
             }
         });
 

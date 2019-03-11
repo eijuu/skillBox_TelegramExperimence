@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class Login {
     private JPanel rootPanel;
@@ -20,6 +22,15 @@ public class Login {
         inputPhoneLabel.setText("<html>Введите код страны и номер<BR>" +
                 "вашего мобильного телефона</html>");
         inputPhoneFormattedTextField.setPreferredSize(new Dimension(200, 30));
+        inputPhoneFormattedTextField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                super.keyReleased(e);
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    continueButton.doClick();
+                }
+            }
+        });
     }
 
     public JPanel getRootPanel() {

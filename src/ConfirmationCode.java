@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class ConfirmationCode {
     private JPanel rootPanel;
@@ -21,6 +23,15 @@ public class ConfirmationCode {
                 "SMS-сообщение с кодом подтверждения.<BR>" +
                 "Пожалуйста, введите этот код в поле ниже:</html>");
         confirmCodePasswordField.setPreferredSize(new Dimension(100, 30));
+        confirmCodePasswordField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                super.keyReleased(e);
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    continueButton.doClick();
+                }
+            }
+        });
     }
 
     public void setInputtedConfirmCode() {
@@ -41,5 +52,9 @@ public class ConfirmationCode {
 
     public JButton getContinueButton() {
         return continueButton;
+    }
+
+    public void setFocusToConfirmCodePasswordField() {
+        confirmCodePasswordField.grabFocus();
     }
 }
